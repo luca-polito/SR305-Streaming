@@ -1,6 +1,6 @@
 # Intel RealSense SR305: acquisizione RGB e profondità
 
-Esempi Python per attività didattiche con la camera **Intel RealSense SR305**. Gli script mostrano in tempo reale l'immagine a colori e la mappa di profondità e permettono di confrontare l'acquisizione originale con l'allineamento del colore alla profondità.
+Esempi Python per attività didattiche con la camera **Intel RealSense SR305**. Il progetto comprende due viewer live, per confrontare l'acquisizione originale con l'allineamento del colore alla profondità, e un viewer per riprodurre registrazioni RealSense `.bag`. Tutti mostrano l'immagine a colori e la mappa di profondità affiancate.
 
 Materiale a cura di [luca-polito](https://github.com/luca-polito).
 
@@ -10,8 +10,9 @@ Materiale a cura di [luca-polito](https://github.com/luca-polito).
 | --- | --- |
 | [`rs_live_basic_example.py`](rs_live_basic_example.py) | Acquisisce e visualizza i frame RGB e di profondità nelle rispettive coordinate originali. Non esegue allineamento geometrico. |
 | [`rs_live_align_example.py`](rs_live_align_example.py) | Allinea il frame RGB alla griglia del sensore di profondità tramite `rs.align(rs.stream.depth)`, prima della visualizzazione. |
+| [`rs_recorded_sequence_basic_example.py`](rs_recorded_sequence_basic_example.py) | Riproduce una registrazione RealSense `.bag`, mostrando colore e profondità affiancati senza allineamento geometrico. |
 
-Entrambi gli script:
+Entrambi gli script live:
 
 - acquisiscono profondità a **640 × 480, 30 fps**, in formato `z16`, e colore a **640 × 480, 30 fps**, in formato `bgr8`;
 - tentano di abilitare l'esposizione automatica RGB, se il sensore la supporta;
@@ -27,7 +28,7 @@ I sensori RGB e di profondità hanno punti di vista e parametri ottici diversi. 
 
 In `rs_live_align_example.py`, `rs.align(rs.stream.depth)` usa la calibrazione della camera e le misure di profondità per riproiettare il colore nelle coordinate della profondità. La profondità mantiene la propria griglia; il colore viene adattato a quella griglia. Dove mancano misure valide o il punto non è visibile al sensore RGB, il colore allineato può presentare aree nere o artefatti, soprattutto lungo i bordi degli oggetti.
 
-Nel programma base, l'eventuale `cv2.resize()` serve solo ad affiancare immagini di dimensioni diverse: non realizza questo allineamento.
+Nei programmi base, live e da registrazione, l'eventuale `cv2.resize()` serve solo ad affiancare immagini di dimensioni diverse: non realizza questo allineamento.
 
 ## Ambiente e dipendenze
 
@@ -36,17 +37,19 @@ Versioni rilevate nell'ambiente locale `realsenseSR305-viewer` su Windows:
 | Componente | Versione | Utilizzo |
 | --- | --- | --- |
 | Python | **3.9.25** | Interprete |
-| `pyrealsense2` | **2.50.0.3812** | Accesso alla camera, acquisizione, esposizione, colorizzazione e allineamento |
+| `pyrealsense2` | **2.50.0.3812** | Accesso alla camera, acquisizione, riproduzione `.bag`, esposizione, colorizzazione e allineamento |
 | `numpy` | **2.0.1** | Conversione dei frame in array e affiancamento delle immagini |
 | `opencv-python` | **4.11.0.86** | Finestre, visualizzazione, conversione RGB/BGR e ridimensionamento |
 
 I pacchetti Python sono elencati in [`requirements.txt`](requirements.txt).
 
+Tutti e tre gli script usano le stesse dipendenze. Il viewer da registrazione utilizza anche `argparse` e `pathlib`, inclusi nella libreria standard Python: non richiedono installazioni aggiuntive.
+
 **Usare Python 3.9 a 64 bit** per riprodurre questo ambiente: la versione indicata di `pyrealsense2` dispone di un pacchetto Windows per Python 3.9, ma non per Python 3.10. Usare **`opencv-python`**, con supporto grafico; la variante `opencv-python-headless` non può aprire la finestra del viewer.
 
 ## Installazione con Conda
 
-Occorrono una SR305 collegata e riconosciuta da Windows, l'accesso alla camera consentito alle applicazioni desktop e Conda disponibile nell'Anaconda Prompt. Chiudere eventuali altri programmi che stanno usando la camera.
+Per l'installazione occorre Conda disponibile nell'Anaconda Prompt. Per gli esempi live servono inoltre una SR305 collegata e riconosciuta da Windows e l'accesso alla camera consentito alle applicazioni desktop. Chiudere eventuali altri programmi che stanno usando la camera. Per il viewer da registrazione basta un file RealSense `.bag` locale con entrambi i flussi RGB e profondità.
 
 Scaricare il repository da GitHub tramite **Code → Download ZIP** ed estrarlo, oppure clonarlo con Git. Aprire Anaconda Prompt nella cartella che contiene gli script e `requirements.txt`, quindi eseguire:
 
@@ -62,6 +65,8 @@ In VS Code selezionare **Python: Select Interpreter** dalla palette comandi e sc
 
 ## Esecuzione
 
+### Streaming live
+
 Con l'ambiente attivo, dalla cartella del progetto eseguire uno script alla volta:
 
 ```bat
@@ -74,7 +79,29 @@ oppure:
 python rs_live_align_example.py
 ```
 
-Attendere qualche secondo per l'adattamento dell'esposizione automatica. Per interrompere lo script, premere **Ctrl+C nel terminale**. Gli script attuali non implementano un comando di uscita con `q` o `Esc`.
+Attendere qualche secondo per l'adattamento dell'esposizione automatica. Per interrompere lo script, premere **Ctrl+C nel terminale**. I due script live non implementano un comando di uscita con `q` o `Esc`.
+
+### Riproduzione di una registrazione
+
+Il terzo script richiede un file **RealSense `.bag` contenente sia colore sia profondità**. Un normale video `.mp4` o `.avi` non contiene i flussi RealSense necessari. Per riprodurre il file non serve collegare la camera.
+
+Passare il percorso tra virgolette, ad esempio:
+
+```bat
+python rs_recorded_sequence_basic_example.py "C:\registrazioni\sequenza.bag"
+```
+
+Oppure avviare lo script senza argomenti e inserire il percorso quando richiesto:
+
+```bat
+python rs_recorded_sequence_basic_example.py
+```
+
+In questo caso incollare il percorso nel terminale e premere **Invio**. Il testo passato a `input()` nel codice è solo il messaggio della richiesta: non occorre modificarlo per scegliere il file. I percorsi relativi sono risolti rispetto alla cartella da cui si avvia il comando.
+
+Per file su Google Drive per desktop, renderli disponibili offline e attendere il download completo, oppure copiarli sul disco locale. Passare un percorso del filesystem, non un link web di condivisione. Il repository contiene gli script; ciascuno deve procurarsi separatamente la registrazione da riprodurre.
+
+La riproduzione usa risoluzioni e frequenze registrate e termina alla fine del file, senza ricominciare. Il colore è mostrato a sinistra, la profondità con la stessa palette Jet degli esempi live a destra. L'esposizione è quella della registrazione. In questo script è possibile uscire con **q**, **Esc** o chiudendo la finestra.
 
 ## Problemi comuni
 
@@ -84,6 +111,9 @@ Attendere qualche secondo per l'adattamento dell'esposizione automatica. Per int
 | `No matching distribution found` per `pyrealsense2==2.50.0.3812` | Controllare con `python --version` di usare Python 3.9 e un interprete a 64 bit. |
 | Camera non rilevata o accesso negato | Controllare collegamento USB, riconoscimento del dispositivo, permessi della camera in Windows e altri programmi che potrebbero utilizzarla. |
 | Immagine RGB scura | Attendere l'adattamento automatico e controllare l'illuminazione e gli eventuali messaggi sull'esposizione nel terminale. |
+| `Recording file not found` | Verificare il percorso del `.bag`; usare le virgolette nel comando se contiene spazi e assicurarsi che il file sia scaricato sul PC. |
+| Il programma mostra la richiesta del percorso e sembra fermo | Incollare il percorso e premere Invio, oppure passarlo direttamente come argomento del comando. |
+| Impossibile avviare la riproduzione `.bag` | Verificare che il file sia una registrazione RealSense leggibile con entrambi i flussi colore e profondità. |
 
 ## Riferimenti e provenienza
 

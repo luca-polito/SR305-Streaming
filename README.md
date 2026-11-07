@@ -8,8 +8,8 @@ Materiale a cura di [luca-polito](https://github.com/luca-polito).
 
 | Script | Funzionalità |
 | --- | --- |
-| [`rs_basic_example.py`](rs_basic_example.py) | Acquisisce e visualizza i frame RGB e di profondità nelle rispettive coordinate originali. Non esegue allineamento geometrico. |
-| [`rs_align_example.py`](rs_align_example.py) | Allinea il frame RGB alla griglia del sensore di profondità tramite `rs.align(rs.stream.depth)`, prima della visualizzazione. |
+| [`rs_live_basic_example.py`](rs_live_basic_example.py) | Acquisisce e visualizza i frame RGB e di profondità nelle rispettive coordinate originali. Non esegue allineamento geometrico. |
+| [`rs_live_align_example.py`](rs_live_align_example.py) | Allinea il frame RGB alla griglia del sensore di profondità tramite `rs.align(rs.stream.depth)`, prima della visualizzazione. |
 
 Entrambi gli script:
 
@@ -25,7 +25,7 @@ Nella palette Jet RealSense le distanze crescono dal **blu**, attraverso ciano e
 
 I sensori RGB e di profondità hanno punti di vista e parametri ottici diversi. Anche quando le immagini hanno la stessa risoluzione, lo stesso pixel `(x, y)` può rappresentare punti diversi della scena.
 
-In `rs_align_example.py`, `rs.align(rs.stream.depth)` usa la calibrazione della camera e le misure di profondità per riproiettare il colore nelle coordinate della profondità. La profondità mantiene la propria griglia; il colore viene adattato a quella griglia. Dove mancano misure valide o il punto non è visibile al sensore RGB, il colore allineato può presentare aree nere o artefatti, soprattutto lungo i bordi degli oggetti.
+In `rs_live_align_example.py`, `rs.align(rs.stream.depth)` usa la calibrazione della camera e le misure di profondità per riproiettare il colore nelle coordinate della profondità. La profondità mantiene la propria griglia; il colore viene adattato a quella griglia. Dove mancano misure valide o il punto non è visibile al sensore RGB, il colore allineato può presentare aree nere o artefatti, soprattutto lungo i bordi degli oggetti.
 
 Nel programma base, l'eventuale `cv2.resize()` serve solo ad affiancare immagini di dimensioni diverse: non realizza questo allineamento.
 
@@ -65,13 +65,13 @@ In VS Code selezionare **Python: Select Interpreter** dalla palette comandi e sc
 Con l'ambiente attivo, dalla cartella del progetto eseguire uno script alla volta:
 
 ```bat
-python rs_basic_example.py
+python rs_live_basic_example.py
 ```
 
 oppure:
 
 ```bat
-python rs_align_example.py
+python rs_live_align_example.py
 ```
 
 Attendere qualche secondo per l'adattamento dell'esposizione automatica. Per interrompere lo script, premere **Ctrl+C nel terminale**. Gli script attuali non implementano un comando di uscita con `q` o `Esc`.

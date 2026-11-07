@@ -47,6 +47,19 @@ Tutti e tre gli script usano le stesse dipendenze. Il viewer da registrazione ut
 
 **Usare Python 3.9 a 64 bit** per riprodurre questo ambiente: la versione indicata di `pyrealsense2` dispone di un pacchetto Windows per Python 3.9, ma non per Python 3.10. Usare **`opencv-python`**, con supporto grafico; la variante `opencv-python-headless` non può aprire la finestra del viewer.
 
+### OpenCV con finestre proprie o con PyQt
+
+Gli esempi di questo repository visualizzano le immagini con `cv2.namedWindow()` e `cv2.imshow()`, quindi richiedono **`opencv-python`**.
+
+Per un'applicazione la cui interfaccia è gestita da **PyQt**, è invece consigliato **`opencv-python-headless`**: OpenCV elabora le immagini, mentre PyQt le visualizza tramite `QImage`, `QPixmap` e widget. La variante headless esclude le dipendenze grafiche di OpenCV e può evitare conflitti con quelle dell'interfaccia. Un conflitto tra OpenCV con supporto grafico e PyQt non è automatico: dipende dalla piattaforma e dalla compilazione di OpenCV.
+
+| Come vengono visualizzate le immagini | Pacchetto consigliato |
+| --- | --- |
+| Finestre OpenCV con `cv2.imshow()` e `cv2.namedWindow()` | `opencv-python` |
+| Interfaccia gestita da PyQt, senza finestre OpenCV | `opencv-python-headless` |
+
+Installare **una sola variante OpenCV per ambiente**: `opencv-python` e `opencv-python-headless` forniscono entrambe il modulo `cv2` e non devono essere installate insieme. Per mantenere sia questi esempi sia un progetto PyQt con headless, usare ambienti separati. Vedere la [documentazione del pacchetto OpenCV](https://pypi.org/project/opencv-python/).
+
 ## Installazione con Conda
 
 Per l'installazione occorre Conda disponibile nell'Anaconda Prompt. Per gli esempi live servono inoltre una SR305 collegata e riconosciuta da Windows e l'accesso alla camera consentito alle applicazioni desktop. Chiudere eventuali altri programmi che stanno usando la camera. Per il viewer da registrazione basta un file RealSense `.bag` locale con entrambi i flussi RGB e profondità.
